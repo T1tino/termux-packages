@@ -18,6 +18,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	# Descarga e instala automáticamente el NDK si Docker no lo tiene mapeado
+	termux_download_android_ndk
+
 	termux_setup_protobuf
 	termux_setup_golang
 	termux_setup_rust
