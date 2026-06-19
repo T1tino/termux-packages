@@ -239,7 +239,7 @@ jobs:
       env:
         DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
         TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
-        ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/26.1.10909125
+        NDK: /usr/local/lib/android/sdk/ndk/26.1.10909125
       run: |
         declare -a packages=()
         for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
