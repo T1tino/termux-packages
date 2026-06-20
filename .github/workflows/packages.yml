@@ -252,13 +252,13 @@ jobs:
         echo "packages: ${packages[*]}"
 
         if [[ "${#packages[@]}" -gt 0 ]]; then
+          # Forzamos la asignación global de la ruta en la consola de la máquina virtual
+          export NDK=/usr/local/lib/android/sdk/ndk/26.1.10909125
+          export ANDROID_NDK_ROOT=/usr/local/lib/android/sdk/ndk/26.1.10909125
+          
           if [ "$DOCKER_BUILD" == 'false' ]; then
-            # Agregamos el export aquí para la compilación local nativa
-            export ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/26.1.10909125
             ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
           else
-            # Forzamos la inyección directa de la variable antes de ejecutar el contenedor de Docker
-            export ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/26.1.10909125
             ./scripts/run-docker.sh ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
           fi
         fi
