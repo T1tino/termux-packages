@@ -66,12 +66,12 @@ fi
 echo "INFO: Using sdkmanager ... $SDK_MANAGER"
 echo "INFO: Using NDK ... $NDK"
 
-yes | $SDK_MANAGER --sdk_root="$ANDROID_HOME" --licenses
+yes 2>/dev/null | $SDK_MANAGER --sdk_root="$ANDROID_HOME" --licenses || true
 
 # The android platforms are used in the ecj and apksigner packages:
-yes | $SDK_MANAGER --sdk_root="$ANDROID_HOME" \
+yes 2>/dev/null | $SDK_MANAGER --sdk_root="$ANDROID_HOME" \
 		"platform-tools" \
 		"build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" \
 		"platforms;android-35" \
 		"platforms;android-28" \
-		"platforms;android-24"
+		"platforms;android-24" || true
