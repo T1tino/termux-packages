@@ -234,7 +234,12 @@ jobs:
         sudo apt install ninja-build
         ./scripts/free-space.sh
 
-        - name: Build packages
+    - name: Setup Android SDK and NDK
+      run: |
+        ./scripts/setup-android-sdk.sh
+        rm -f ${HOME}/lib/ndk-*.zip ${HOME}/lib/sdk-*.zip
+
+    - name: Build packages
         if: ${{ steps.build-info.outputs.skip-building != 'true' }}
         env:
           DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
