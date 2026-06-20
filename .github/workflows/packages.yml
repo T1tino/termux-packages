@@ -234,34 +234,32 @@ jobs:
         sudo apt install ninja-build
         ./scripts/free-space.sh
 
-    - name: Build packages
-      if: ${{ steps.build-info.outputs.skip-building != 'true' }}
-      env:
-        DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
-        TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
-        NDK: /usr/local/lib/android/sdk/ndk/26.1.10909125
-      run: |
-        declare -a packages=()
-        for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
-          if [ -f "./built_${repo}_packages.txt" ]; then
-            packages+=($(cat "./built_${repo}_packages.txt"))
+        - name: Build packages
+        if: ${{ steps.build-info.outputs.skip-building != 'true' }}
+        env:
+          DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
+          TERMUX_DOCKER__CONTAINER_EXEC_COMMAND__PRE_CHECK_IF_WILL_BUILD_PACKAGES: "true"
+        run: |
+          declare -a packages=()
+          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+            if [ -f "./built_${repo}_packages.txt" ]; then
+              packages+=($(cat "./built_${repo}_packages.txt"))
+            fi
+          done
+  
+          echo "packages: ${packages[*]}"
+  
+          if [[ "${#packages[@]}" -gt 0 ]]; then
+            # SOLUCIÓN: Forzamos la descarga del NDK correcto oficial del ecosistema Termux
+            ./scripts/setup-android-sdk.sh
+            
+            if [ "$DOCKER_BUILD" == 'false' ]; then
+              ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
+            else
+              ./scripts/run-docker.sh ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
+            fi
           fi
-        done
-
-        echo "packages: ${packages[*]}"
-
-        if [[ "${#packages[@]}" -gt 0 ]]; then
-          # Forzamos la asignación global de la ruta en la consola de la máquina virtual
-          export NDK=/usr/local/lib/android/sdk/ndk/26.1.10909125
-          export ANDROID_NDK_ROOT=/usr/local/lib/android/sdk/ndk/26.1.10909125
-          
-          if [ "$DOCKER_BUILD" == 'false' ]; then
-            ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
-          else
-            ./scripts/run-docker.sh ./build-package.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}"
-          fi
-        fi
 
     - name: Generate build artifacts
       if: always()
