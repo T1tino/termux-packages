@@ -318,8 +318,12 @@ if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
     export NDK="${TERMUX_PKGS__BUILD__REPO_ROOT_DIR}/build-tools/android-ndk-r${TERMUX_NDK_VERSION}"
 else
     : "${ANDROID_HOME:="${HOME}/lib/android-sdk-$TERMUX_SDK_REVISION"}"
-    # Si la variable NDK ya fue detectada por GitHub Env, la dejamos intacta
-    [ -n "$NDK" ] || export NDK="${HOME}/lib/android-ndk-r${TERMUX_NDK_VERSION}"
+    # SOLUCIÓN DE SEGURIDAD: Evaluamos la variable de forma segura para evitar el "unbound variable"
+    if [ -n "${NDK:-}" ]; then
+        export NDK="${NDK}"
+    else
+        export NDK="${HOME}/lib/android-ndk-r${TERMUX_NDK_VERSION}"
+    fi
 fi
 
 
