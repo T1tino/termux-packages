@@ -314,18 +314,17 @@ TERMUX_NDK_VERSION="${TERMUX_NDK_VERSION_NUM}${TERMUX_NDK_REVISION}"
 # and update SHA256 sums in scripts/setup-android-sdk.sh
 # check all packages build and run correctly and bump if needed
 
-: "${TERMUX_HOST_LLVM_MAJOR_VERSION:="19"}"
-: "${TERMUX_HOST_LLVM_BASE_DIR:="/usr/lib/llvm-${TERMUX_HOST_LLVM_MAJOR_VERSION}"}"
-
-: "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-17-openjdk-amd64}"
+# SOLUCIÓN DE JAVA: Forzar la ruta real de Java 21 en Ubuntu 24.04 de GitHub Actions
+: "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-21-openjdk-amd64}"
 export JAVA_HOME="${TERMUX_JAVA_HOME}"
 
 if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
     export ANDROID_HOME="${TERMUX_PKGS__BUILD__REPO_ROOT_DIR}/build-tools/android-sdk-${TERMUX_SDK_REVISION}"
     export NDK="${TERMUX_PKGS__BUILD__REPO_ROOT_DIR}/build-tools/android-ndk-r${TERMUX_NDK_VERSION}"
 else
+    # SOLUCIÓN DEL NDK: Forzar la ruta dinámica del NDK r28c descargado por Termux
     : "${ANDROID_HOME:="${HOME}/lib/android-sdk-$TERMUX_SDK_REVISION"}"
-    : "${NDK:="${HOME}/lib/android-ndk-r${TERMUX_NDK_VERSION}"}"
+    export NDK="${HOME}/lib/android-ndk-r28c"
 fi
 
 
