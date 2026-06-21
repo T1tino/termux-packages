@@ -318,8 +318,8 @@ if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
     export NDK="${TERMUX_PKGS__BUILD__REPO_ROOT_DIR}/build-tools/android-ndk-r${TERMUX_NDK_VERSION}"
 else
     : "${ANDROID_HOME:="${HOME}/lib/android-sdk-$TERMUX_SDK_REVISION"}"
-    # SOLUCIÓN NDK: Aseguramos la ruta exacta del home de GitHub Actions
-    export NDK="/home/runner/lib/android-ndk-r28c"
+    # Si la variable NDK ya fue detectada por el workflow, la dejamos intacta
+    [ -d "$NDK" ] || export NDK="${HOME}/lib/android-ndk-r${TERMUX_NDK_VERSION}"
 fi
 
 
