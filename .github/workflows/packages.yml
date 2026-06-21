@@ -235,7 +235,7 @@ jobs:
         sudo apt install ninja-build
         ./scripts/free-space.sh
 
-        - name: Setup Android SDK and NDK
+    - name: Setup Android SDK and NDK
       run: |
         # 1. Crear puente de compatibilidad física para Java en Ubuntu 24.04
         sudo mkdir -p /usr/lib/jvm
