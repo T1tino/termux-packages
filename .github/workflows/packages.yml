@@ -3,7 +3,7 @@ name: Packages
 on:
   push:
     branches:
-    - ${{ github.event.repository.default_branch }}
+    - termux-adb
     - master
     - dev
     - 'dev/**'
