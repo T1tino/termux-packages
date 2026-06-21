@@ -237,25 +237,24 @@ jobs:
 
     - name: Setup Android SDK and NDK
       run: |
-        # 1. Puente de compatibilidad para Java
+        # 1. Crear puente de compatibilidad física para Java
         sudo mkdir -p /usr/lib/jvm
         sudo ln -sf "$JAVA_HOME" /usr/lib/jvm/java-17-openjdk-amd64
 
-        # 2. Descargar el SDK y NDK oficial de Termux
+        # 2. Ejecutar la descarga base del SDK oficial
         ./scripts/setup-android-sdk.sh
         rm -f ${HOME}/lib/ndk-*.zip ${HOME}/lib/sdk-*.zip
 
-        # 3. BÚSQUEDA DINÁMICA DE LA SUB CARPETA
+        # 3. DETECCIÓN AUTOMÁTICA INTELIGENTE: Encuentra dinámicamente cualquier subcarpeta NDK
         REAL_NDK_PATH=$(find ${HOME}/lib -maxdepth 1 -type d -name "android-ndk-*" | head -n 1)
 
-        # 4. GUARDADO GLOBAL: Registramos la ruta en el entorno persistente de GitHub
+        # 4. REGISTRO PERSISTENTE: Inyectamos la ruta detectada en el entorno de GitHub
         if [ -d "$REAL_NDK_PATH" ]; then
-          echo "NDK_DETECTED=$REAL_NDK_PATH" >> $GITHUB_ENV
           echo "NDK=$REAL_NDK_PATH" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$REAL_NDK_PATH" >> $GITHUB_ENV
-          echo "[+] Ruta guardada globalmente en GitHub Env: $REAL_NDK_PATH"
+          echo "[+] Subcarpeta NDK detectada y registrada con éxito: $REAL_NDK_PATH"
         else
-          echo "[!] Error crítico: No se encontró la carpeta extraída del NDK"
+          echo "[!] Error crítico: No se encontró ninguna subcarpeta extraída de NDK"
           exit 1
         fi
 
