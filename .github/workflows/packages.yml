@@ -235,18 +235,28 @@ jobs:
         sudo apt install ninja-build
         ./scripts/free-space.sh
 
-    - name: Setup Android SDK and NDK
+        - name: Setup Android SDK and NDK
       run: |
-        # Crear un puente de compatibilidad para la ruta de Java que properties.sh tiene hardcoded
+        # 1. Crear puente de compatibilidad física para Java en Ubuntu 24.04
         sudo mkdir -p /usr/lib/jvm
-        sudo ln -sf "$JAVA_HOME" /usr/lib/jvm/java-17-openjdk-amd64
+        sudo ln -sf "$JAVA_HOME" /usr/lib/jvm/java-21-openjdk-amd64
 
-        # Forzar las variables globales correctas en la sesión
-        export JAVA_HOME="$JAVA_HOME"
-        export NDK="/home/runner/lib/android-ndk-r28c"
-
-        # Descargar el SDK y limpiar la caché
+        # 2. Descargar el SDK oficial de Termux (Esto creará la carpeta del NDK)
         ./scripts/setup-android-sdk.sh
+
+        # 3. DETECCIÓN AUTOMÁTICA DE LA CARPETA: Busca dinámicamente cualquier subcarpeta NDK
+        DETECTED_NDK=$(ls -d ${HOME}/lib/android-ndk-* 2>/dev/null | head -n 1)
+
+        # 4. Si la encuentra, exporta la ruta real automáticamente para que Docker la herede
+        if [ -d "$DETECTED_NDK" ]; then
+          echo "[OK] NDK detectado automáticamente en: $DETECTED_NDK"
+          export NDK="$DETECTED_NDK"
+          export ANDROID_NDK_HOME="$DETECTED_NDK"
+        else
+          echo "[ERROR] No se pudo encontrar ninguna carpeta NDK en ${HOME}/lib/"
+        fi
+
+        # Limpiar los instaladores comprimidos para ahorrar espacio en disco
         rm -f ${HOME}/lib/ndk-*.zip ${HOME}/lib/sdk-*.zip
 
     - name: Build packages
