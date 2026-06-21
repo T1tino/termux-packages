@@ -301,23 +301,16 @@ TERMUX_SCRIPTDIR="${TERMUX_SCRIPTDIR:-TERMUX_PKGS__BUILD__REPO_ROOT_DIR}" # Depr
 
 TERMUX_SDK_REVISION=9123335
 TERMUX_ANDROID_BUILD_TOOLS_VERSION=33.0.1
-# when changing the above:
-# change TERMUX_PKG_VERSION (and remove TERMUX_PKG_REVISION if necessary) in:
-#   apksigner, d8
-# and trigger rebuild of them
-: "${TERMUX_NDK_VERSION_NUM:="29"}"
+
+: "${TERMUX_NDK_VERSION_NUM:="28c"}" # <--- Forzamos la r28c que descarga tu Actions
 : "${TERMUX_NDK_REVISION:=""}"
 TERMUX_NDK_VERSION="${TERMUX_NDK_VERSION_NUM}${TERMUX_NDK_REVISION}"
-# when changing the above:
-# update version and hashsum in packages
-#   libandroid-stub, libc++, ndk-multilib, ndk-sysroot, vulkan-loader-android
-# and update SHA256 sums in scripts/setup-android-sdk.sh
-# check all packages build and run correctly and bump if needed
 
 : "${TERMUX_HOST_LLVM_MAJOR_VERSION:="21"}"
 : "${TERMUX_HOST_LLVM_BASE_DIR:="/usr/lib/llvm-${TERMUX_HOST_LLVM_MAJOR_VERSION}"}"
 
-: "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-17-openjdk-amd64}"
+# SOLUCIÓN JAVA: Apuntamos al Java 21 real de Ubuntu 24.04 de GitHub
+: "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-21-openjdk-amd64}"
 export JAVA_HOME="${TERMUX_JAVA_HOME}"
 
 if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
@@ -325,7 +318,8 @@ if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
     export NDK="${TERMUX_PKGS__BUILD__REPO_ROOT_DIR}/build-tools/android-ndk-r${TERMUX_NDK_VERSION}"
 else
     : "${ANDROID_HOME:="${HOME}/lib/android-sdk-$TERMUX_SDK_REVISION"}"
-    : "${NDK:="${HOME}/lib/android-ndk-r${TERMUX_NDK_VERSION}"}"
+    # SOLUCIÓN NDK: Aseguramos la ruta exacta del home de GitHub Actions
+    export NDK="/home/runner/lib/android-ndk-r28c"
 fi
 
 
