@@ -235,15 +235,17 @@ jobs:
         sudo apt install ninja-build
         ./scripts/free-space.sh
 
-    # SOLUCIÓN AQUÍ: Preparamos Java 17 de manera válida para la máquina virtual
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        
     - name: Setup Android SDK and NDK
       run: |
+        # Crear un puente de compatibilidad para la ruta de Java que properties.sh tiene hardcoded
+        sudo mkdir -p /usr/lib/jvm
+        sudo ln -sf "$JAVA_HOME" /usr/lib/jvm/java-17-openjdk-amd64
+
+        # Forzar las variables globales correctas en la sesión
+        export JAVA_HOME="$JAVA_HOME"
+        export NDK="/home/runner/lib/android-ndk-r28c"
+
+        # Descargar el SDK y limpiar la caché
         ./scripts/setup-android-sdk.sh
         rm -f ${HOME}/lib/ndk-*.zip ${HOME}/lib/sdk-*.zip
 
