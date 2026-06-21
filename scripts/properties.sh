@@ -316,17 +316,18 @@ TERMUX_NDK_VERSION="${TERMUX_NDK_VERSION_NUM}${TERMUX_NDK_REVISION}"
 
 # SOLUCIÓN DE JAVA: Forzar la ruta real de Java 21 en Ubuntu 24.04 de GitHub Actions
 : "${TERMUX_JAVA_HOME:=/usr/lib/jvm/java-21-openjdk-amd64}"
-export JAVA_HOME="${TERMUX_JAVA_HOME}"
+# Corregir la ruta de Java para que sdkmanager no falle en Ubuntu 24.04
+export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
+export PATH="$JAVA_HOME/bin:$PATH"
 
 if [[ "${TERMUX_PACKAGES_OFFLINE-false}" == "true" ]]; then
     export ANDROID_HOME="${TERMUX_PKGS__BUILD__REPO_ROOT_DIR}/build-tools/android-sdk-${TERMUX_SDK_REVISION}"
     export NDK="${TERMUX_PKGS__BUILD__REPO_ROOT_DIR}/build-tools/android-ndk-r${TERMUX_NDK_VERSION}"
 else
-    # SOLUCIÓN DEL NDK: Forzar la ruta dinámica del NDK r28c descargado por Termux
     : "${ANDROID_HOME:="${HOME}/lib/android-sdk-$TERMUX_SDK_REVISION"}"
-    export NDK="${HOME}/lib/android-ndk-r28c"
+    # FORZAR NDK REAL: Obliga a Docker a buscar la ruta exacta descargada por GitHub Actions
+    export NDK="/home/runner/lib/android-ndk-r28c"
 fi
-
 
 
 ###
